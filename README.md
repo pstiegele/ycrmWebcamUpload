@@ -36,8 +36,11 @@ This steps are needed to setup the script on a raspberry pi.
 - Chown the ramdisk directory by the group: `sudo chown -R :ramdiskAccess /mnt/ramdisk`
 - Be sure to grant read and write access to group members: `sudo chmod -R g+rwxs /mnt/ramdisk`
 - Add crontab entry: `sudo nano /etc/crontab` --> add `* *     * * *   ycrm    /usr/bin/python3 /home/ycrm/ycrmWebcamUpload/uploadwebcamimage.py`
-
 - If not already configured, set the webcams to upload the images accordingly to the defined paths. 
+- Additional: Add Cronjob to update Newsletter and the app event website. Open Crontab via `sudo nano /etc/crontab` and add
+    - `0 *     * * *   ycrm    curl https://ycrm.de/custom/newsletter/cleverreach_collect_mailing.php`
+    - `0 *     * * *   ycrm    curl https://ycrm.de/custom/app/tapps/veranstaltungen/bearbeite_veranstaltungen.php`
+
 ## Hint
 If python error occurs that host key is missing: just connect once manually per ssh to server, save host key and thats it
 
