@@ -19,14 +19,15 @@ This steps are needed to setup the script on a raspberry pi.
 - Mount ramdisk: `sudo mount -a`
 - Check newly mounted ramdisk: `df -h`
 - Configure python script: `nano /home/ycrm/ycrmWebcamUpload/uploadwebcamimage.py` --> set ftp and telegram credentials
+- Connect once to remote host to save unknown key: `ssh <user>@<hostname>`
 - Install local FTP server `vsftpd`: `sudo apt install vsftpd`
 - Check installation success: `sudo systemctl status vsftpd`
 - Adapt `vsftpd` config: `sudo nano /etc/vsftpd.conf` --> 
--- Make sure, `anonymous_enable` is set to `No`
--- Set `local_enable=YES`
--- Set `write_enable=YES`
--- Set `chroot_local_user=YES`
--- Set `local_umask=002`
+ - Make sure, `anonymous_enable` is set to `No`
+ - Set `local_enable=YES`
+ - Set `write_enable=YES`
+ - Set `chroot_local_user=YES`
+ - Set `local_umask=002`
 - Restart `vsftpd` by `sudo /etc/init.d/vsftpd restart`
 - Add local user to grant access to ramdisk directory: `sudo adduser ycrmwebcam --shell /bin/false --home /mnt/ramdisk --no-create-home`. Password can be used from previous installation (if available). 
 - Add non existing shells by opening `sudo nano /etc/shells` and add the line `/bin/false` at the bottom.
@@ -39,10 +40,6 @@ This steps are needed to setup the script on a raspberry pi.
 - If not already configured, set the webcams to upload the images accordingly to the defined paths. 
 ## Hint
 If python error occurs that host key is missing: just connect once manually per ssh to server, save host key and thats it
-
-## Todo
-- notify if offline upload occurs
-- create notification if uploads occurs with an delay lesser than 90s
 
 ## Credits
 (C) 2020 Paul Stiegele

@@ -2,12 +2,9 @@
 # This script is uploading new webcam images out of the local ftp space up to the ycrm.de webspace
 # to define new webcam images or change the paths just edit the files variable
 # 
-# Author: Paul Stiegele, 2020, paul@stiegele.name
+# Author: Paul Stiegele, 2020 & 2023, paul@stiegele.name
 
-# todo: notify if offline upload occurs
-# todo: create notification if uploads occurs with an delay lesser than 90s
 # hint: if python error occurs that host key is missing: just connect once per ssh to server, save host key and thats it
-
 
 import pysftp
 import os
