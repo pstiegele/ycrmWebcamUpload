@@ -12,11 +12,15 @@
 import pysftp
 import os
 import time
+import requests
 
 # ftp credentials for the ycrm.de website are stored here
-host = "<replaceMe>.1and1-data.host"
-username = "<replaceMe>"
-password = "<replaceMe>"
+host = "<host>.1and1-data.host"
+username = "<username>"
+password = "<password>"
+telegramBotID = "<telegramBotID>"
+telegramChatID = "<chatID>"
+statusFilePath = "/mnt/ramdisk/"
 
 # an array of webcam files which are under observation
 # name: just for the .status file name, must be unique
@@ -26,24 +30,24 @@ password = "<replaceMe>"
 files = [
     {
         "name": "Webcam1",
-        "localFile": "/home/ycrmwebcam/webcam1/ycrm01.jpg",
+        "localFile": "/mnt/ramdisk/ycrm01.jpg",
         "setAsOffline": False,
         "uploadPath": "webcam1",
-        "offlineFile": "offline/ycrm01.jpg"
+        "offlineFile": "/home/ycrm/ycrmWebcamUpload/offline/ycrm01.jpg"
     },
     {
         "name": "Webcam2",
-        "localFile": "/home/ycrmwebcam/webcam2/ycrm02.jpg",
+        "localFile": "/mnt/ramdisk/ycrm02.jpg",
         "setAsOffline": False,
         "uploadPath": "webcam2",
-        "offlineFile": "offline/ycrm02.jpg"
+        "offlineFile": "/home/ycrm/ycrmWebcamUpload/offline/ycrm02.jpg"
     },
     {
         "name": "Webcam3",
-        "localFile": "/home/ycrmwebcam/webcam3/ycrm03.jpg",
+        "localFile": "/mnt/ramdisk/ycrm03.jpg",
         "setAsOffline": False,
         "uploadPath": "webcam3",
-        "offlineFile": "offline/ycrm03.jpg"
+        "offlineFile": "/home/ycrm/ycrmWebcamUpload/offline/ycrm03.jpg"
     }
 ]
 
@@ -84,14 +88,14 @@ for x in range(3):
             print("file exists")
             # check if file needs to be uploaded
             fileToUpload = checkfile(file)
-            if fileToUpload is 1: #upload
+            if fileToUpload == 1: #upload
                 f = ""
                 # opens status file if file was already uploaded
                 # the if else is just to create the status file if it does not exist yet
-                if os.path.isfile("webcam_"+file["name"]+".status"):
-                    f = open("webcam_"+file["name"]+".status", "r")
+                if os.path.isfile(os.path.join(statusFilePath, "webcam_" + file["name"] + ".status")):
+                    f = open(os.path.join(statusFilePath, "webcam_"+file["name"]+".status"), "r")
                 else:
-                    f = open("webcam_"+file["name"]+".status", "w+")
+                    f = open(os.path.join(statusFilePath, "webcam_"+file["name"]+".status"), "w+")
                 fcontent = f.read()
                 # if status file has the same timestamp as the file, the file was already
                 # uploaded
@@ -102,17 +106,17 @@ for x in range(3):
                     # file is uploaded, so replace the timestamp in the status file with the
                     # modified date of the current file
                     f.close()
-                    f = open("webcam_"+file["name"]+".status", "w+")
+                    f = open(os.path.join(statusFilePath, "webcam_"+file["name"]+".status"), "w+")
                     f.write(str(os.path.getmtime(file["localFile"])))
                 else:
                     print("status file checked: no diff detected, abort upload")
                 f.close()
-            elif fileToUpload is 2: # offline
+            elif fileToUpload == 2: # offline
                 # read status file
-                if os.path.isfile("webcam_"+file["name"]+".status"):
-                    f = open("webcam_"+file["name"]+".status", "r")
+                if os.path.isfile(os.path.join(statusFilePath, "webcam_"+file["name"]+".status")):
+                    f = open(os.path.join(statusFilePath, "webcam_"+file["name"]+".status"), "r")
                 else:
-                    f = open("webcam_"+file["name"]+".status", "w+")
+                    f = open(os.path.join(statusFilePath,"webcam_"+file["name"]+".status"), "w+")
                 fcontent = f.read()
                 # if status file already contains "offline" the last upload was the offline file
                 # so its not necessary to upload the file again
@@ -123,13 +127,17 @@ for x in range(3):
                     upload(file["offlineFile"], file["uploadPath"])
                     # write in the status file, that the last upload was an offline upload
                     f.close()
-                    f = open("webcam_"+file["name"]+".status", "w+")
+                    f = open(os.path.join(statusFilePath, "webcam_"+file["name"]+".status"), "w+")
                     f.write("offline")
+                    payload = { 'chat_id' : telegramChatID, 'text' : 'YCRM-Webseite: ' + file["name"] + ' is offline.' }
+                    res = requests.post('https://api.telegram.org/bot' + telegramBotID + '/sendMessage', data=payload)
                 else:
                     print("status file checked: no diff detected, abort upload")
                 f.close()
         else:
             print("file not found")
+            payload = { 'chat_id' : telegramChatID, 'text' : 'YCRM-Webseite: ' + file["name"] + ' file not found.' }
+            res = requests.post('https://api.telegram.org/bot' + telegramBotID + '/sendMessage', data=payload)
     print()     
     print()
     print()
