@@ -23,11 +23,11 @@ This steps are needed to setup the script on a raspberry pi.
 - Install local FTP server `vsftpd`: `sudo apt install vsftpd`
 - Check installation success: `sudo systemctl status vsftpd`
 - Adapt `vsftpd` config: `sudo nano /etc/vsftpd.conf` --> 
- - Make sure, `anonymous_enable` is set to `No`
- - Set `local_enable=YES`
- - Set `write_enable=YES`
- - Set `chroot_local_user=YES`
- - Set `local_umask=002`
+    - Make sure, `anonymous_enable` is set to `No`
+    - Set `local_enable=YES`
+    - Set `write_enable=YES`
+    - Set `chroot_local_user=YES`
+    - Set `local_umask=002`
 - Restart `vsftpd` by `sudo /etc/init.d/vsftpd restart`
 - Add local user to grant access to ramdisk directory: `sudo adduser ycrmwebcam --shell /bin/false --home /mnt/ramdisk --no-create-home`. Password can be used from previous installation (if available). 
 - Add non existing shells by opening `sudo nano /etc/shells` and add the line `/bin/false` at the bottom.
